@@ -2,20 +2,24 @@
 
 # First we import the library and modules we would use
 import sqlite3
+from openpyxl import Workbook
 # Connect and create our Database
+name = input("Please input Your name: ")
+name = "_".join(name.split())  # Remove spaces and join with underscores
 
-connection = sqlite3.connect("CGPA Calculator")
+connection = sqlite3.connect(f"{name}.db")
+
 
 # Assign the Database to a cursor for storing and retrieving of data from the database
 
 cursor = connection.cursor()
 
 # Create a table in our database for our data
-name = input("Please input Your name: ")
+
 try:
     # We use try and except to avoid error, if the table has been created already
 
-    cursor.execute("""CREATE TABLE cgpa( 
+    cursor.execute(f"""CREATE TABLE {name}( 
                     course_title text,
                     course_unit integer,
                     grade text,
@@ -26,7 +30,7 @@ except sqlite3.OperationalError:
     ...
 # Delete the previous data from the database to avoid reoccurring figures
 
-cursor.execute(f"DELETE FROM cgpa")
+cursor.execute(f"DELETE FROM {name}")
 # set the number of times you want the code to loop through
 
 count = 0
@@ -76,17 +80,31 @@ while count < ntimes:
 
     # insert the values gotten into the database
 
-    cursor.execute(f"INSERT INTO cgpa values ('{course_title}', '{course_unit}', '{grade}', '{point}')")
+    cursor.execute(f"INSERT INTO {name} values ('{course_title}', '{course_unit}', '{grade}', '{point}')")
 
-    course_codes = [cursor.execute(f"SELECT [0] FROM {name} value {course_title}")].append
-    course_units =[cursor.execute(f"SELECT [0] FROM {name} value {course_unit}")].append
-    grades = [cursor.execute(f"SELECT [0] FROM {name} value {grade}")].append
-    point = [cursor.execute(f"SELECT [0] FROM {name} value {point}")].append
+    cursor.execute(f"SELECT course_title FROM {name} WHERE course_title = '{course_title}'")
+    result = cursor.fetchone()
+    if result:
+        course_codes.append(result[0])
 
+    cursor.execute(f"SELECT course_unit FROM {name} WHERE course_title = '{course_title}'")
+    result = cursor.fetchone()
+    if result:
+        course_units.append(result[0])
+
+    cursor.execute(f"SELECT grade FROM {name} WHERE course_title = '{course_title}'")
+    result = cursor.fetchone()
+    if result:
+        grades.append(result[0])
+
+    cursor.execute(f"SELECT point FROM {name} WHERE course_title = '{course_title}'")
+    result = cursor.fetchone()
+    if result:
+        points.append(result[0])
 
 # sum the total values in point
 
-cursor.execute(f'SELECT SUM (point) FROM cgpa')
+cursor.execute(f'SELECT SUM (point) FROM {name}')
 
 # fetch the sum total from the database
 
@@ -94,7 +112,7 @@ sum_point = cursor.fetchone()[0]
 
 print(sum_point)
 
-cursor.execute(f'SELECT SUM (course_unit) FROM cgpa')
+cursor.execute(f'SELECT SUM (course_unit) FROM {name}')
 
 sum_unit = cursor.fetchone()[0]
 
@@ -106,7 +124,7 @@ cgpa = sum_point/sum_unit
 
 # get all the values in the database
 print(f"Dear {name}, your result is as follows..")
-cursor.execute(f"SELECT * FROM cgpa")
+cursor.execute(f"SELECT * FROM {name}")
 # print(cursor.fetchall())
 print(course_codes)
 print(course_units)
@@ -116,7 +134,7 @@ print(f"Your total grade point is: {round(cgpa,2)}")
 
 # determine the class using the if statements
 
-if cgpa >= 4.5 <= 5:
+if 4.5 <= cgpa <= 5:
     print(f"Congratulations {name}, you have a Distinction!!!")
 elif cgpa >= 3.5 <= 4.49:
     print(f"Congratulations {name}, You have an Upper Credit!!")
@@ -132,6 +150,38 @@ else:
 # df.to_csv(name.csv, sep='\t')
 
 # commit the data into the database
+
+data = []
+
+cursor.execute(f"SELECT course_title, course_unit, grade, point FROM {name}")
+results = cursor.fetchall()
+
+for row in results:
+    data.append(row)
+
+# Specify the path and name of the Excel file
+
+excel_file = f"{name}_results.xlsx"
+
+# Create a new workbook and select the active sheet
+
+workbook = Workbook()
+sheet = workbook.active
+
+# Write the header row
+
+sheet.append(["Course Title", "Course Unit", "Grade", "Point"])
+
+# Write the data rows
+
+for row in data:
+    sheet.append(row)
+
+# Save the workbook
+
+workbook.save(excel_file)
+
+print(f"Excel file '{excel_file}' has been created successfully!")
 
 connection.commit()
 # close database connection
