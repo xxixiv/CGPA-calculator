@@ -90,14 +90,14 @@ def save_results():
         messagebox.showerror("Error", "Invalid course unit entered.")
         return
 
-    # Calculate CGPA
+    # Calculate gpa
     cursor.execute(f'SELECT SUM(point) FROM {name}')
     sum_point = cursor.fetchone()[0]
 
     cursor.execute(f'SELECT SUM(course_unit) FROM {name}')
     sum_unit = cursor.fetchone()[0]
 
-    cgpa = sum_point / sum_unit
+    gpa = sum_point / sum_unit
 
     # Get all the values from the database
     cursor.execute(f"SELECT * FROM {name}")
@@ -114,21 +114,21 @@ def save_results():
 
     workbook.save(excel_file)
 
-    # Display CGPA and class
-    messagebox.showinfo("Result", f"CGPA: {round(cgpa, 2)}")
+    # Display gpa and class
+    messagebox.showinfo("Result", f"gpa: {round(gpa, 2)}")
 
-    if 4.5 <= cgpa <= 5:
+    if 4.5 <= gpa <= 5:
         messagebox.showinfo("Result", f"Congratulations {name}, you have a Distinction!")
-    elif 3.5 <= cgpa < 4.5:
+    elif 3.5 <= gpa < 4.5:
         messagebox.showinfo("Result", f"Congratulations {name}, you have an Upper Credit!")
-    elif 2.5 <= cgpa < 3.5:
+    elif 2.5 <= gpa < 3.5:
         messagebox.showinfo("Result", f"Congratulations {name}, you have a Lower Credit!")
-    elif 2.0 <= cgpa < 2.5:
+    elif 2.0 <= gpa < 2.5:
         messagebox.showinfo("Result", f"Oh no, {name}, you have a Pass!")
-    elif 0 <= cgpa < 2.0:
+    elif 0 <= gpa < 2.0:
         messagebox.showinfo("Result", f"Oh no, {name}, you Failed!")
     else:
-        messagebox.showinfo("Result", "Your CGPA cannot be calculated.")
+        messagebox.showinfo("Result", "Your gpa cannot be calculated.")
 
     # Commit and close the database connection
     connection.commit()
@@ -159,7 +159,7 @@ def show_course_details():
 
 
 window = tk.Tk()
-window.title("CGPA Calculator")
+window.title("gpa Calculator")
 
 name_label = tk.Label(window, text="Name:")
 name_label.pack()
