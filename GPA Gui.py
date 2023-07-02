@@ -1,8 +1,7 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, ttk
 import sqlite3
 from openpyxl import Workbook
-
 
 def set_entries():
     global ntimes, course_entries, unit_entries, grade_entries
@@ -14,27 +13,26 @@ def set_entries():
         return
 
     for i in range(ntimes):
-        course_label = tk.Label(window, text=f"Course {i + 1}:")
+        course_label = tk.Label(scrollable_frame, text=f"Course {i + 1}:")
         course_label.pack()
 
-        course_entry = tk.Entry(window)
+        course_entry = tk.Entry(scrollable_frame)
         course_entry.pack()
         course_entries.append(course_entry)
 
-        unit_label = tk.Label(window, text="Units:")
+        unit_label = tk.Label(scrollable_frame, text="Units:")
         unit_label.pack()
 
-        unit_entry = tk.Entry(window)
+        unit_entry = tk.Entry(scrollable_frame)
         unit_entry.pack()
         unit_entries.append(unit_entry)
 
-        grade_label = tk.Label(window, text="Grade:")
+        grade_label = tk.Label(scrollable_frame, text="Grade:")
         grade_label.pack()
 
-        grade_entry = tk.Entry(window)
+        grade_entry = tk.Entry(scrollable_frame)
         grade_entry.pack()
         grade_entries.append(grade_entry)
-
 
 def save_results():
     name = name_entry.get()
@@ -44,9 +42,7 @@ def save_results():
 
     # Connect to the database
     connection = sqlite3.connect(f"{name}.db")
-
     name = "_".join(name.split())  # Remove spaces and join with underscores
-
     cursor = connection.cursor()
 
     # Create the table if it doesn't exist
@@ -146,7 +142,6 @@ def clear_entries():
     for entry in grade_entries:
         entry.destroy()
 
-
 def show_course_details():
     details = ""
     for i in range(ntimes):
@@ -157,35 +152,57 @@ def show_course_details():
 
     messagebox.showinfo("Course Details", details)
 
-
+# Create the Tkinter window
 window = tk.Tk()
-window.title("gpa Calculator")
 
-name_label = tk.Label(window, text="Name:")
-name_label.pack()
-name_entry = tk.Entry(window)
-name_entry.pack()
+# Set the window title
+window.title("Gpa Calculator")
 
-ntimes_label = tk.Label(window, text="Number of Courses Offered:")
-ntimes_label.pack()
-ntimes_entry = tk.Entry(window)
-ntimes_entry.pack()
+# Set the window icon
+window.iconbitmap("icon.ico")
+
+# Create a scrollable frame
+canvas = tk.Canvas(window)
+scrollbar = ttk.Scrollbar(window, orient="vertical", command=canvas.yview)
+scrollable_frame = ttk.Frame(canvas)
+
+scrollable_frame.bind(
+    "<Configure>",
+    lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+)
+
+canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+canvas.configure(yscrollcommand=scrollbar.set)
+
+canvas.pack(side="left", fill="both", expand=True)
+scrollbar.pack(side="right", fill="y")
+
+# Create the GUI elements
+name_label = tk.Label(scrollable_frame, text="Name:")
+name_label.pack(anchor="center")
+name_entry = tk.Entry(scrollable_frame)
+name_entry.pack(anchor="center", pady=5)
+
+ntimes_label = tk.Label(scrollable_frame, text="Number of Courses Offered:")
+ntimes_label.pack(anchor="center")
+ntimes_entry = tk.Entry(scrollable_frame)
+ntimes_entry.pack(anchor="center", pady=5)
 
 course_entries = []
 unit_entries = []
 grade_entries = []
 
-set_entries_button = tk.Button(window, text="Set Entries", command=set_entries)
-set_entries_button.pack()
+set_entries_button = ttk.Button(scrollable_frame, text="Set Entries", command=set_entries)
+set_entries_button.pack(anchor="center", pady=10)
 
-calculate_button = tk.Button(window, text="Calculate", command=save_results)
-calculate_button.pack()
+calculate_button = ttk.Button(scrollable_frame, text="Calculate", command=save_results)
+calculate_button.pack(anchor="center", pady=5)
 
-show_details_button = tk.Button(window, text="Show Course Details", command=show_course_details)
-show_details_button.pack()
+show_details_button = ttk.Button(scrollable_frame, text="Show Course Details", command=show_course_details)
+show_details_button.pack(anchor="center", pady=5)
 
-clear_button = tk.Button(window, text="Clear Entries", command=clear_entries)
-clear_button.pack()
+clear_button = ttk.Button(scrollable_frame, text="Clear Entries", command=clear_entries)
+clear_button.pack(anchor="center", pady=5)
 
+# Start the Tkinter event loop
 window.mainloop()
-

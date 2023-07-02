@@ -1,4 +1,4 @@
-# Code that calculates CGPA
+# Code that calculates gpa
 
 # First we import the library and modules we would use
 import sqlite3
@@ -120,7 +120,7 @@ print(sum_unit)
 
 # divide the values
 
-cgpa = sum_point/sum_unit
+gpa = sum_point/sum_unit
 
 # get all the values in the database
 print(f"Dear {name}, your result is as follows..")
@@ -130,22 +130,22 @@ print(course_codes)
 print(course_units)
 print(grades)
 print(points)
-print(f"Your total grade point is: {round(cgpa,2)}")
+print(f"Your total grade point is: {round(gpa,2)}")
 
 # determine the class using the if statements
 
-if 4.5 <= cgpa <= 5:
+if 4.5 <= gpa <= 5:
     print(f"Congratulations {name}, you have a Distinction!!!")
-elif cgpa >= 3.5 <= 4.49:
+elif gpa >= 3.5 <= 4.49:
     print(f"Congratulations {name}, You have an Upper Credit!!")
-elif cgpa >= 2.5 <= 3.49:
+elif gpa >= 2.5 <= 3.49:
     print(f"Congratulations {name}, You have a Lower Credit!")
-elif cgpa >= 2.0 <= 2.49:
+elif gpa >= 2.0 <= 2.49:
     print(f"Oh no, sorrow {name}!!! You have a Pass")
-elif cgpa >= 0 <= 1.99:
+elif gpa >= 0 <= 1.99:
     print(f"Oh no, weep {name}!!! You Failed")
 else:
-    print("Your CGPA cannot be calculated due to an wrong input or something try again")
+    print("Your gpa cannot be calculated due to an wrong input or something try again")
 # print(df)
 # df.to_csv(name.csv, sep='\t')
 
